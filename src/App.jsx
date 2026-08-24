@@ -126,26 +126,48 @@ export default App
 import ProductoCard from './components/ProductoCard';
 import { productos } from './data/productos';
 import './App.css';
+
 function App() {
-const disponibles = productos.filter(producto => producto.stock > 0);
-const valorInventario = productos.reduce(
-(total, producto) => total + producto.precio * producto.stock,
-0
-);
-return (
-<main className="contenedor">
-<h1>Tienda tecnológica</h1>
-<p>Productos disponibles: {disponibles.length}</p>
-<p>Valor del inventario: ${valorInventario}</p>
-<section className="productos">
-{productos.map(producto => (
-<ProductoCard
-key={producto.id}
-producto={producto}
-/>
-))}
-</section>
-</main>
-);
+  // Filtrar solo los productos disponibles
+  const disponibles = productos.filter(producto => producto.stock > 0);
+
+  // Verificar si hay al menos un producto agotado con .some()
+  const hayAgotados = productos.some(producto => producto.stock === 0);
+
+  // Calcular el valor total del inventario (precio * stock) con .reduce()
+  const valorInventario = productos.reduce(
+    (total, producto) => total + (producto.precio * producto.stock),
+    0
+  );
+
+  return (
+    <main className="contenedor">
+      <h1>Tienda Tecnológica</h1>
+
+      <div className="resumen-panel">
+        <p><strong>Total productos en catálogo:</strong> {productos.length}</p>
+        <p><strong>Productos disponibles:</strong> {disponibles.length}</p>
+        <p><strong>Valor total del inventario:</strong> ${valorInventario.toLocaleString()}</p>
+        {hayAgotados && <p className="alerta-agotados">⚠️ Atención: Hay productos agotados en el inventario.</p>}
+      </div>
+
+      <h2>Catálogo Completo</h2>
+      <section className="productos">
+        {productos.map(producto => (
+          <ProductoCard key={producto.id} producto={producto} />
+        ))}
+      </section>
+
+      <hr />
+
+      <h2>Solo Productos Disponibles</h2>
+      <section className="productos">
+        {disponibles.map(producto => (
+          <ProductoCard key={producto.id} producto={producto} />
+        ))}
+      </section>
+    </main>
+  );
 }
+
 export default App;
