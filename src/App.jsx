@@ -128,13 +128,8 @@ import { productos } from './data/productos';
 import './App.css';
 
 function App() {
-  // Filtrar solo los productos disponibles
   const disponibles = productos.filter(producto => producto.stock > 0);
-
-  // Verificar si hay al menos un producto agotado con .some()
   const hayAgotados = productos.some(producto => producto.stock === 0);
-
-  // Calcular el valor total del inventario (precio * stock) con .reduce()
   const valorInventario = productos.reduce(
     (total, producto) => total + (producto.precio * producto.stock),
     0
@@ -142,13 +137,27 @@ function App() {
 
   return (
     <main className="contenedor">
-      <h1>Tienda Tecnológica</h1>
+      <h1>🛒 Tienda Tecnológica</h1>
 
       <div className="resumen-panel">
-        <p><strong>Total productos en catálogo:</strong> {productos.length}</p>
-        <p><strong>Productos disponibles:</strong> {disponibles.length}</p>
-        <p><strong>Valor total del inventario:</strong> ${valorInventario.toLocaleString()}</p>
-        {hayAgotados && <p className="alerta-agotados">⚠️ Atención: Hay productos agotados en el inventario.</p>}
+        <div className="resumen-item">
+          <span className="resumen-label">Total Productos</span>
+          <span className="resumen-valor">{productos.length}</span>
+        </div>
+        <div className="resumen-item">
+          <span className="resumen-label">Disponibles</span>
+          <span className="resumen-valor">{disponibles.length}</span>
+        </div>
+        <div className="resumen-item">
+          <span className="resumen-label">Valor del Inventario</span>
+          <span className="resumen-valor">${valorInventario.toLocaleString()}</span>
+        </div>
+        
+        {hayAgotados && (
+          <div className="alerta-agotados">
+            ⚠️ Atención: Hay productos agotados en el inventario.
+          </div>
+        )}
       </div>
 
       <h2>Catálogo Completo</h2>
