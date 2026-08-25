@@ -299,7 +299,7 @@ function App() {
       {/* Renderizado de la lista de productos filtrados (Puntos 6 y 7) */}
       <section className="productos">
         {productosFiltrados.length === 0 ? (
-          <p className="sin-resultados">❌ No se encontraron productos con los filtros aplicados.</p>
+          <p className="sin-resultados">No se encontraron productos con los filtros aplicados.</p>
         ) : (
           productosFiltrados.map(producto => (
             <ProductoCard key={producto.id} producto={producto} />
