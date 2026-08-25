@@ -123,7 +123,8 @@ function App() {
 export default App
 */
 
-import ProductoCard from './components/ProductoCard';
+// 24 de agosto del 2026
+/*import ProductoCard from './components/ProductoCard';
 import { productos } from './data/productos';
 import './App.css';
 
@@ -137,7 +138,7 @@ function App() {
 
   return (
     <main className="contenedor">
-      <h1>🛒 Tienda Tecnológica</h1>
+      <h1>Tienda Tecnológica</h1>
 
       <div className="resumen-panel">
         <div className="resumen-item">
@@ -155,7 +156,7 @@ function App() {
         
         {hayAgotados && (
           <div className="alerta-agotados">
-            ⚠️ Atención: Hay productos agotados en el inventario.
+            Atención: Hay productos agotados en el inventario.
           </div>
         )}
       </div>
@@ -174,6 +175,136 @@ function App() {
         {disponibles.map(producto => (
           <ProductoCard key={producto.id} producto={producto} />
         ))}
+      </section>
+    </main>
+  );
+}
+
+export default App;
+*/
+
+
+// 25 de agosto del 2026
+import { useState } from 'react';
+import ProductoCard from './components/ProductoCard';
+import { productos } from './data/productos';
+import './App.css';
+
+function App() {
+  // 1. Estados para los filtros (Puntos 5, 8 y 9)
+  const [busqueda, setBusqueda] = useState('');
+  const [categoria, setCategoria] = useState('Todas');
+  const [soloDisponibles, setSoloDisponibles] = useState(false);
+
+  // 2. Extraer categorías únicas para el menú desplegable
+  const categoriasUnicas = ['Todas', ...new Set(productos.map(p => p.categoria))];
+
+  // 3. Lógica de filtrado combinada (Puntos 6, 8 y 9)
+  const productosFiltrados = productos.filter(producto => {
+    const coincideNombre = producto.nombre
+      .toLowerCase()
+      .includes(busqueda.toLowerCase());
+      
+    const coincideCategoria = 
+      categoria === 'Todas' || producto.categoria === categoria;
+      
+    const coincideStock = !soloDisponibles || producto.stock > 0;
+
+    return coincideNombre && coincideCategoria && coincideStock;
+  });
+
+  // Reto Libre - Opción F: Limpiar filtros (Punto 12)
+  const limpiarFiltros = () => {
+    setBusqueda('');
+    setCategoria('Todas');
+    setSoloDisponibles(false);
+  };
+
+  // Cálculo para el resumen inicial
+  const valorInventario = productos.reduce(
+    (total, p) => total + (p.precio * p.stock), 
+    0
+  );
+  const hayAgotados = productos.some(p => p.stock === 0);
+
+  return (
+    <main className="contenedor">
+      <h1>Catálogo Interactivo en React</h1>
+
+      {/* Panel informativo */}
+      <div className="resumen-panel">
+        <div className="resumen-item">
+          <span className="resumen-label">Total en Catálogo</span>
+          <span className="resumen-valor">{productos.length}</span>
+        </div>
+        <div className="resumen-item">
+          <span className="resumen-label">Resultados Visibles</span>
+          <span className="resumen-valor">{productosFiltrados.length}</span>
+        </div>
+        <div className="resumen-item">
+          <span className="resumen-label">Valor del Inventario</span>
+          <span className="resumen-valor">${valorInventario.toLocaleString('es-CO')}</span>
+        </div>
+
+        {hayAgotados && (
+          <div className="alerta-agotados">
+            Atención: Hay productos sin stock.
+          </div>
+        )}
+      </div>
+
+      {/* Sección de Controles y Filtros (Puntos 5, 8, 9, 10 y 12) */}
+      <section className="filtros-contenedor">
+        <div className="grupo-filtro">
+          <input
+            type="text"
+            className="input-busqueda"
+            placeholder="Buscar producto por nombre..."
+            value={busqueda}
+            onChange={(evento) => setBusqueda(evento.target.value)}
+          />
+
+          <select
+            className="select-categoria"
+            value={categoria}
+            onChange={(evento) => setCategoria(evento.target.value)}
+          >
+            {categoriasUnicas.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grupo-opciones">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={soloDisponibles}
+              onChange={(evento) => setSoloDisponibles(evento.target.checked)}
+            />
+            Mostrar únicamente disponibles
+          </label>
+
+          <button className="btn-limpiar" onClick={limpiarFiltros}>
+            Limpiar Filtros
+          </button>
+        </div>
+
+        {/* Contador dinámico (Punto 10) */}
+        <p className="contador-resultados">
+          Productos encontrados: <strong>{productosFiltrados.length}</strong>
+        </p>
+      </section>
+
+      {/* Renderizado de la lista de productos filtrados (Puntos 6 y 7) */}
+      <section className="productos">
+        {productosFiltrados.length === 0 ? (
+          <p className="sin-resultados">❌ No se encontraron productos con los filtros aplicados.</p>
+        ) : (
+          productosFiltrados.map(producto => (
+            <ProductoCard key={producto.id} producto={producto} />
+          ))
+        )}
       </section>
     </main>
   );
