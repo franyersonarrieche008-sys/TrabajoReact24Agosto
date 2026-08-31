@@ -188,19 +188,22 @@ export default App;
 // 25 de agosto del 2026
 import { useState } from 'react';
 import ProductoCard from './components/ProductoCard';
-import { productos } from './data/productos';
+import { productos as productosIniciales } from "./data/productos";
 import './App.css';
+import FormularioProducto from "./components/FormularioProducto";
 
 function App() {
-  // 1. Estados para los filtros (Puntos 5, 8 y 9)
+
+  <FormularioProducto />
+
+  const [productos, setProductos] =
+    useState(productosIniciales);
   const [busqueda, setBusqueda] = useState('');
   const [categoria, setCategoria] = useState('Todas');
   const [soloDisponibles, setSoloDisponibles] = useState(false);
 
-  // 2. Extraer categorías únicas para el menú desplegable
   const categoriasUnicas = ['Todas', ...new Set(productos.map(p => p.categoria))];
 
-  // 3. Lógica de filtrado combinada (Puntos 6, 8 y 9)
   const productosFiltrados = productos.filter(producto => {
     const coincideNombre = producto.nombre
       .toLowerCase()
@@ -214,14 +217,12 @@ function App() {
     return coincideNombre && coincideCategoria && coincideStock;
   });
 
-  // Reto Libre - Opción F: Limpiar filtros (Punto 12)
   const limpiarFiltros = () => {
     setBusqueda('');
     setCategoria('Todas');
     setSoloDisponibles(false);
   };
 
-  // Cálculo para el resumen inicial
   const valorInventario = productos.reduce(
     (total, p) => total + (p.precio * p.stock), 
     0
@@ -233,8 +234,11 @@ function App() {
       <h1>Catálogo Interactivo en React</h1>
 */
 
+<<<<<<< HEAD
       {/* Panel informativo */}
       /* 
+=======
+>>>>>>> 174147e (feat: crear formulario para productos)
       <div className="resumen-panel">
         <div className="resumen-item">
           <span className="resumen-label">Total en Catálogo</span>
@@ -255,9 +259,13 @@ function App() {
           </div>
         )}
       </div>
+<<<<<<< HEAD
 */
       {/* Sección de Controles y Filtros (Puntos 5, 8, 9, 10 y 12) */}
       /*
+=======
+
+>>>>>>> 174147e (feat: crear formulario para productos)
       <section className="filtros-contenedor">
         <div className="grupo-filtro">
           <input
@@ -293,16 +301,24 @@ function App() {
             Limpiar Filtros
           </button>
         </div>
+<<<<<<< HEAD
 */
         {/* Contador dinámico (Punto 10) */}
         /*
+=======
+
+>>>>>>> 174147e (feat: crear formulario para productos)
         <p className="contador-resultados">
           Productos encontrados: <strong>{productosFiltrados.length}</strong>
         </p>
       </section>
+<<<<<<< HEAD
 */
       {/* Renderizado de la lista de productos filtrados (Puntos 6 y 7) */}
       /*
+=======
+
+>>>>>>> 174147e (feat: crear formulario para productos)
       <section className="productos">
         {productosFiltrados.length === 0 ? (
           <p className="sin-resultados">No se encontraron productos con los filtros aplicados.</p>
