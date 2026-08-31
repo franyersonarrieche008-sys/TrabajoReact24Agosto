@@ -234,11 +234,9 @@ function App() {
       <h1>Catálogo Interactivo en React</h1>
 */
 
-<<<<<<< HEAD
       {/* Panel informativo */}
       /* 
 =======
->>>>>>> 174147e (feat: crear formulario para productos)
       <div className="resumen-panel">
         <div className="resumen-item">
           <span className="resumen-label">Total en Catálogo</span>

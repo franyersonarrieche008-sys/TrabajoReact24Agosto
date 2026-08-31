@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Formulario para agregar nuevos productos al inventario (Taller 3)
 import { useState } from 'react';
 
@@ -123,7 +122,6 @@ function FormularioProducto({ onAgregar }) {
   );
 }
 
-=======
 import { useState } from "react";
 function FormularioProducto() {
 const [formulario, setFormulario] = useState({
@@ -161,5 +159,5 @@ Agregar producto
 </form>
 );
 }
->>>>>>> 174147e (feat: crear formulario para productos)
+
 export default FormularioProducto;
