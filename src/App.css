@@ -872,6 +872,7 @@ h1 {
   outline: none;
   transition: var(--transition);
   background-color: #fafafa;
+  color: var(--text-main);
 }
 
 .campo-formulario input:focus {
