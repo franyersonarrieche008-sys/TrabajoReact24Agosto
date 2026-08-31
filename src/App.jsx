@@ -236,7 +236,6 @@ function App() {
 
       {/* Panel informativo */}
       /* 
-=======
       <div className="resumen-panel">
         <div className="resumen-item">
           <span className="resumen-label">Total en Catálogo</span>
@@ -257,11 +256,9 @@ function App() {
           </div>
         )}
       </div>
-<<<<<<< HEAD
 */
       {/* Sección de Controles y Filtros (Puntos 5, 8, 9, 10 y 12) */}
       /*
-=======
 
 >>>>>>> 174147e (feat: crear formulario para productos)
       <section className="filtros-contenedor">
@@ -299,13 +296,10 @@ function App() {
             Limpiar Filtros
           </button>
         </div>
-<<<<<<< HEAD
 */
         {/* Contador dinámico (Punto 10) */}
         /*
-=======
 
->>>>>>> 174147e (feat: crear formulario para productos)
         <p className="contador-resultados">
           Productos encontrados: <strong>{productosFiltrados.length}</strong>
         </p>
@@ -314,9 +308,7 @@ function App() {
 */
       {/* Renderizado de la lista de productos filtrados (Puntos 6 y 7) */}
       /*
-=======
 
->>>>>>> 174147e (feat: crear formulario para productos)
       <section className="productos">
         {productosFiltrados.length === 0 ? (
           <p className="sin-resultados">No se encontraron productos con los filtros aplicados.</p>
