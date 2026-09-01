@@ -328,6 +328,7 @@ export default App;
 
 
 // 31 de agosto del 2026 - Taller 3: De catálogo a gestor de inventario
+/*
 import { useState } from 'react';
 import ProductoCard from './components/ProductoCard';
 import FormularioProducto from './components/FormularioProducto';
@@ -335,48 +336,20 @@ import { productos as productosIniciales } from './data/productos';
 import './App.css';
 
 function App() {
-  // ------------------------------------------------------------------
-  // 1. ESTADO PRINCIPAL DEL INVENTARIO (Taller 3)
-  // productosIniciales solo se usa para arrancar la app. A partir de
-  // aquí todo el inventario vive en el estado "productos", y se
-  // actualiza siempre con setProductos (nunca modificando el arreglo
-  // original con push, splice, etc.).
-  // ------------------------------------------------------------------
   const [productos, setProductos] = useState(productosIniciales);
-
-  // Estados para los filtros (funcionalidad ya existente del catálogo)
   const [busqueda, setBusqueda] = useState('');
   const [categoria, setCategoria] = useState('Todas');
   const [soloDisponibles, setSoloDisponibles] = useState(false);
 
-  // ------------------------------------------------------------------
-  // 2. AGREGAR PRODUCTO
-  // Recibe el producto ya validado desde FormularioProducto y lo suma
-  // al inventario usando spread, para crear un arreglo NUEVO en lugar
-  // de modificar el anterior.
-  // ------------------------------------------------------------------
   const agregarProducto = (nuevoProducto) => {
     setProductos([...productos, nuevoProducto]);
   };
 
-  // ------------------------------------------------------------------
-  // 3. ELIMINAR PRODUCTO
-  // Usamos filter() porque filter() devuelve un arreglo NUEVO con todos
-  // los productos que SÍ cumplen la condición (id !== id a eliminar).
-  // find() en cambio solo devuelve un único elemento, no serviría para
-  // reconstruir la lista completa sin el producto eliminado.
-  // ------------------------------------------------------------------
   const eliminarProducto = (id) => {
     const nuevaLista = productos.filter((producto) => producto.id !== id);
     setProductos(nuevaLista);
   };
 
-  // ------------------------------------------------------------------
-  // 4. MODIFICAR STOCK (entrada/salida de inventario)
-  // Usamos map() porque necesitamos devolver un arreglo del mismo
-  // tamaño, cambiando SOLO el producto cuyo id coincide.
-  // Math.max(0, ...) evita que el stock quede en negativo.
-  // ------------------------------------------------------------------
   const modificarStock = (id, cambio) => {
     const nuevosProductos = productos.map((producto) => {
       if (producto.id === id) {
@@ -387,10 +360,8 @@ function App() {
     setProductos(nuevosProductos);
   };
 
-  // Categorías únicas para el menú desplegable (se recalculan si cambia el inventario)
   const categoriasUnicas = ['Todas', ...new Set(productos.map((p) => p.categoria))];
 
-  // Filtrado combinado: nombre + categoría + solo disponibles
   const productosFiltrados = productos.filter((producto) => {
     const coincideNombre = producto.nombre
       .toLowerCase()
@@ -406,11 +377,6 @@ function App() {
     setSoloDisponibles(false);
   };
 
-  // ------------------------------------------------------------------
-  // 5. TABLERO DE INDICADORES (Taller 3, Misión 8)
-  // Los tres se recalculan en cada render, así que cambian solos
-  // cuando el estado "productos" cambia (agregar, eliminar, stock).
-  // ------------------------------------------------------------------
   const productosAgotados = productos.filter((p) => p.stock === 0);
   const valorInventario = productos.reduce(
     (total, p) => total + p.precio * p.stock,
@@ -421,7 +387,6 @@ function App() {
     <main className="contenedor">
       <h1>Gestor de Inventario</h1>
 
-      {/* Tablero de indicadores dinámicos */}
       <div className="resumen-panel">
         <div className="resumen-item">
           <span className="resumen-label">Productos registrados</span>
@@ -443,10 +408,8 @@ function App() {
         )}
       </div>
 
-      {/* Formulario para agregar productos nuevos */}
       <FormularioProducto onAgregar={agregarProducto} />
 
-      {/* Filtros del catálogo */}
       <section className="filtros-contenedor">
         <div className="grupo-filtro">
           <input
@@ -490,7 +453,6 @@ function App() {
         </p>
       </section>
 
-      {/* Catálogo / inventario */}
       <section className="productos">
         {productosFiltrados.length === 0 ? (
           <p className="sin-resultados">No se encontraron productos con los filtros aplicados.</p>
@@ -501,6 +463,309 @@ function App() {
               producto={producto}
               onEliminar={eliminarProducto}
               onModificarStock={modificarStock}
+            />
+          ))
+        )}
+      </section>
+    </main>
+  );
+}
+
+export default App;
+*/
+
+// 1 de septiembre del 2026 - Taller 1 Sep: persistencia con localStorage,
+// edición de productos, orden y mensajes de estado en la interfaz.
+import { useState, useEffect } from 'react';
+import ProductoCard from './components/ProductoCard';
+import FormularioProducto from './components/FormularioProducto';
+import { productos as productosIniciales } from './data/productos';
+import './App.css';
+
+const CLAVE_INVENTARIO = 'inventario';
+
+function App() {
+  // ------------------------------------------------------------------
+  // MISIÓN 3. Inventario inicial: si ya hay algo guardado en
+  // localStorage lo usamos; si no, arrancamos con productosIniciales.
+  // ------------------------------------------------------------------
+  const obtenerProductosIniciales = () => {
+    const guardados = localStorage.getItem(CLAVE_INVENTARIO);
+
+    if (guardados) {
+      return JSON.parse(guardados);
+    }
+
+    return productosIniciales;
+  };
+
+  const [productos, setProductos] = useState(obtenerProductosIniciales);
+
+  // Estados para los filtros (funcionalidad ya existente del catálogo)
+  const [busqueda, setBusqueda] = useState('');
+  const [categoria, setCategoria] = useState('Todas');
+  const [soloDisponibles, setSoloDisponibles] = useState(false);
+
+  // MISIÓN 6. Criterio de ordenamiento seleccionado.
+  const [orden, setOrden] = useState('ninguno');
+
+  // MISIÓN 4. Producto que está siendo editado (null = modo agregar).
+  const [productoEditando, setProductoEditando] = useState(null);
+
+  // MISIÓN 7. Mensaje de estado visible en la interfaz (reemplaza a alert()).
+  const [mensaje, setMensaje] = useState('');
+
+  // Muestra un mensaje unos segundos y luego lo limpia solo.
+  const mostrarMensaje = (texto) => {
+    setMensaje(texto);
+  };
+
+  useEffect(() => {
+    if (!mensaje) return;
+
+    const temporizador = setTimeout(() => setMensaje(''), 3000);
+    return () => clearTimeout(temporizador);
+  }, [mensaje]);
+
+  // ------------------------------------------------------------------
+  // MISIÓN 2. Cada vez que "productos" cambia, lo guardamos en
+  // localStorage convertido a texto con JSON.stringify().
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    localStorage.setItem(CLAVE_INVENTARIO, JSON.stringify(productos));
+  }, [productos]);
+
+  // ------------------------------------------------------------------
+  // AGREGAR PRODUCTO
+  // ------------------------------------------------------------------
+  const agregarProducto = (nuevoProducto) => {
+    setProductos([...productos, nuevoProducto]);
+    mostrarMensaje('Producto agregado correctamente.');
+  };
+
+  // ------------------------------------------------------------------
+  // MISIÓN 5. ACTUALIZAR PRODUCTO (edición)
+  // Usamos map() para devolver un arreglo del mismo tamaño, cambiando
+  // solo el producto cuyo id coincide con el que se editó.
+  // ------------------------------------------------------------------
+  const actualizarProducto = (actualizado) => {
+    const nuevaLista = productos.map((producto) =>
+      producto.id === actualizado.id ? actualizado : producto,
+    );
+
+    setProductos(nuevaLista);
+    setProductoEditando(null);
+    mostrarMensaje('Producto actualizado correctamente.');
+  };
+
+  // ------------------------------------------------------------------
+  // ELIMINAR PRODUCTO (con confirmación - Reto de autonomía)
+  // ------------------------------------------------------------------
+  const eliminarProducto = (id) => {
+    const producto = productos.find((p) => p.id === id);
+    const confirmar = window.confirm(`¿Seguro que quieres eliminar "${producto?.nombre}"?`);
+
+    if (!confirmar) return;
+
+    const nuevaLista = productos.filter((producto) => producto.id !== id);
+    setProductos(nuevaLista);
+
+    // Si el producto eliminado era el que estaba en edición, salimos del modo edición.
+    if (productoEditando?.id === id) {
+      setProductoEditando(null);
+    }
+
+    mostrarMensaje('Producto eliminado.');
+  };
+
+  // ------------------------------------------------------------------
+  // MODIFICAR STOCK (entrada/salida de inventario)
+  // ------------------------------------------------------------------
+  const modificarStock = (id, cambio) => {
+    const nuevosProductos = productos.map((producto) => {
+      if (producto.id === id) {
+        return { ...producto, stock: Math.max(0, producto.stock + cambio) };
+      }
+      return producto;
+    });
+    setProductos(nuevosProductos);
+  };
+
+  // MISIÓN 4. Botón "Editar": guarda el producto elegido para que el
+  // formulario lo cargue.
+  const iniciarEdicion = (producto) => {
+    setProductoEditando(producto);
+  };
+
+  const cancelarEdicion = () => {
+    setProductoEditando(null);
+  };
+
+  // Categorías únicas para el menú desplegable (se recalculan si cambia el inventario)
+  const categoriasUnicas = ['Todas', ...new Set(productos.map((p) => p.categoria))];
+
+  // Filtrado combinado: nombre + categoría + solo disponibles
+  const productosFiltrados = productos.filter((producto) => {
+    const coincideNombre = producto.nombre
+      .toLowerCase()
+      .includes(busqueda.toLowerCase());
+    const coincideCategoria = categoria === 'Todas' || producto.categoria === categoria;
+    const coincideStock = !soloDisponibles || producto.stock > 0;
+    return coincideNombre && coincideCategoria && coincideStock;
+  });
+
+  // ------------------------------------------------------------------
+  // MISIÓN 6. Ordenamiento. Se hace SIEMPRE sobre una copia
+  // ([...productosFiltrados]) para no mutar el estado directamente.
+  // ------------------------------------------------------------------
+  const productosOrdenados = [...productosFiltrados].sort((a, b) => {
+    switch (orden) {
+      case 'nombre-asc':
+        return a.nombre.localeCompare(b.nombre);
+      case 'precio-asc':
+        return a.precio - b.precio;
+      case 'precio-desc':
+        return b.precio - a.precio;
+      case 'stock-asc':
+        return a.stock - b.stock;
+      case 'stock-desc':
+        return b.stock - a.stock;
+      default:
+        return 0;
+    }
+  });
+
+  const limpiarFiltros = () => {
+    setBusqueda('');
+    setCategoria('Todas');
+    setSoloDisponibles(false);
+    setOrden('ninguno');
+  };
+
+  // ------------------------------------------------------------------
+  // TABLERO DE INDICADORES
+  // ------------------------------------------------------------------
+  const productosAgotados = productos.filter((p) => p.stock === 0);
+  const valorInventario = productos.reduce(
+    (total, p) => total + p.precio * p.stock,
+    0,
+  );
+  // Reto de autonomía: precio promedio del inventario.
+  const precioPromedio = productos.length
+    ? productos.reduce((total, p) => total + p.precio, 0) / productos.length
+    : 0;
+
+  return (
+    <main className="contenedor">
+      <h1>Gestor de Inventario</h1>
+
+      {/* Mensaje de estado (Misión 7): reemplaza el uso de alert() */}
+      {mensaje && <p className="mensaje-estado">{mensaje}</p>}
+
+      {/* Tablero de indicadores dinámicos */}
+      <div className="resumen-panel">
+        <div className="resumen-item">
+          <span className="resumen-label">Productos registrados</span>
+          <span className="resumen-valor">{productos.length}</span>
+        </div>
+        <div className="resumen-item">
+          <span className="resumen-label">Productos agotados</span>
+          <span className="resumen-valor resumen-valor-alerta">{productosAgotados.length}</span>
+        </div>
+        <div className="resumen-item">
+          <span className="resumen-label">Valor del inventario</span>
+          <span className="resumen-valor">${valorInventario.toLocaleString('es-CO')}</span>
+        </div>
+        <div className="resumen-item">
+          <span className="resumen-label">Precio promedio</span>
+          <span className="resumen-valor">${precioPromedio.toLocaleString('es-CO', { maximumFractionDigits: 0 })}</span>
+        </div>
+
+        {productosAgotados.length > 0 && (
+          <div className="alerta-agotados">
+            Atención: hay {productosAgotados.length} producto(s) sin stock.
+          </div>
+        )}
+      </div>
+
+      {/* Formulario reutilizado para agregar y editar (Misión 5) */}
+      <FormularioProducto
+        onAgregar={agregarProducto}
+        onActualizar={actualizarProducto}
+        productoEditando={productoEditando}
+        onCancelarEdicion={cancelarEdicion}
+      />
+
+      {/* Filtros y ordenamiento del catálogo */}
+      <section className="filtros-contenedor">
+        <div className="grupo-filtro">
+          <input
+            type="text"
+            className="input-busqueda"
+            placeholder="Buscar producto por nombre..."
+            value={busqueda}
+            onChange={(evento) => setBusqueda(evento.target.value)}
+          />
+
+          <select
+            className="select-categoria"
+            value={categoria}
+            onChange={(evento) => setCategoria(evento.target.value)}
+          >
+            {categoriasUnicas.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          {/* MISIÓN 6. Selector de ordenamiento */}
+          <select
+            className="select-orden"
+            value={orden}
+            onChange={(evento) => setOrden(evento.target.value)}
+          >
+            <option value="ninguno">Sin ordenar</option>
+            <option value="nombre-asc">Nombre A-Z</option>
+            <option value="precio-asc">Precio menor a mayor</option>
+            <option value="precio-desc">Precio mayor a menor</option>
+            <option value="stock-asc">Stock menor a mayor</option>
+            <option value="stock-desc">Stock mayor a menor</option>
+          </select>
+        </div>
+
+        <div className="grupo-opciones">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={soloDisponibles}
+              onChange={(evento) => setSoloDisponibles(evento.target.checked)}
+            />
+            Mostrar únicamente disponibles
+          </label>
+
+          <button className="btn-limpiar" onClick={limpiarFiltros}>
+            Limpiar filtros
+          </button>
+        </div>
+
+        <p className="contador-resultados">
+          Productos encontrados: <strong>{productosOrdenados.length}</strong>
+        </p>
+      </section>
+
+      {/* Catálogo / inventario */}
+      <section className="productos">
+        {productosOrdenados.length === 0 ? (
+          <p className="sin-resultados">No se encontraron productos con los filtros aplicados.</p>
+        ) : (
+          productosOrdenados.map((producto) => (
+            <ProductoCard
+              key={producto.id}
+              producto={producto}
+              onEliminar={eliminarProducto}
+              onModificarStock={modificarStock}
+              onEditar={iniciarEdicion}
             />
           ))
         )}
