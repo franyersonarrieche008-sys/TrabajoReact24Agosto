@@ -1,10 +1,12 @@
-// Formulario para agregar nuevos productos al inventario (Taller 3)
-import { useState } from 'react';
+// Formulario para agregar y editar productos del inventario (Taller 1 Sep)
+import { useState, useEffect } from 'react';
 
-// onAgregar llega desde App.jsx por props: es la función que realmente
-// actualiza el estado del inventario. Este componente solo se encarga
+// onAgregar y onActualizar llegan desde App.jsx por props: son las
+// funciones que realmente actualizan el estado del inventario.
+// productoEditando (o null) le dice a este componente si debe mostrarse
+// en modo "Agregar" o en modo "Editar". Este componente solo se encarga
 // de capturar y validar lo que escribe el usuario.
-function FormularioProducto({ onAgregar }) {
+function FormularioProducto({ onAgregar, onActualizar, productoEditando, onCancelarEdicion }) {
   // Estado propio del formulario. Guarda lo que el usuario va escribiendo.
   const [formulario, setFormulario] = useState({
     nombre: '',
@@ -15,6 +17,22 @@ function FormularioProducto({ onAgregar }) {
 
   // Guarda el mensaje de error a mostrar (si existe)
   const [error, setError] = useState('');
+
+  // MISIÓN 5, paso 2: cuando llega un producto en edición, copiamos sus
+  // valores al formulario. Este efecto reacciona cada vez que
+  // productoEditando cambia (por ejemplo, al presionar "Editar" en otra
+  // tarjeta).
+  useEffect(() => {
+    if (productoEditando) {
+      setFormulario({
+        nombre: productoEditando.nombre,
+        categoria: productoEditando.categoria,
+        precio: productoEditando.precio,
+        stock: productoEditando.stock,
+      });
+      setError('');
+    }
+  }, [productoEditando]);
 
   // Se ejecuta en cada onChange de los inputs.
   // Usa spread (...formulario) para copiar los valores actuales
@@ -28,7 +46,9 @@ function FormularioProducto({ onAgregar }) {
     setError('');
   };
 
-  // Se ejecuta al enviar el formulario (onSubmit)
+  // Se ejecuta al enviar el formulario (onSubmit).
+  // MISIÓN 5, paso 3: si hay un producto en edición, llamamos a
+  // onActualizar; si no, llamamos a onAgregar (comportamiento original).
   const manejarEnvio = (evento) => {
     evento.preventDefault();
 
@@ -43,26 +63,39 @@ function FormularioProducto({ onAgregar }) {
       return;
     }
 
-    const nuevoProducto = {
-      id: Date.now(), // id único simple basado en la hora actual
-      nombre: formulario.nombre.trim(),
-      categoria: formulario.categoria.trim(),
-      precio: Number(formulario.precio),
-      stock: Number(formulario.stock),
-      // Imagen genérica para productos agregados manualmente
-      imagen: 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&q=80',
-    };
+    if (productoEditando) {
+      // Modo edición: conservamos el id y la imagen originales.
+      const productoActualizado = {
+        ...productoEditando,
+        nombre: formulario.nombre.trim(),
+        categoria: formulario.categoria.trim(),
+        precio: Number(formulario.precio),
+        stock: Number(formulario.stock),
+      };
+      onActualizar(productoActualizado);
+    } else {
+      // Modo agregar (comportamiento original)
+      const nuevoProducto = {
+        id: Date.now(), // id único simple basado en la hora actual
+        nombre: formulario.nombre.trim(),
+        categoria: formulario.categoria.trim(),
+        precio: Number(formulario.precio),
+        stock: Number(formulario.stock),
+        // Imagen genérica para productos agregados manualmente
+        imagen: 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&q=80',
+      };
+      onAgregar(nuevoProducto);
+    }
 
-    onAgregar(nuevoProducto); // avisa a App.jsx que agregue el producto
-
-    // Limpia el formulario para el siguiente registro
+    // Limpia el formulario y vuelve a modo "Agregar" para el siguiente registro
     setFormulario({ nombre: '', categoria: '', precio: '', stock: '' });
     setError('');
   };
 
   return (
     <section className="formulario-panel">
-      <h2>Agregar producto</h2>
+      {/* MISIÓN 5, paso 1: el título cambia según el modo */}
+      <h2>{productoEditando ? 'Editar producto' : 'Agregar producto'}</h2>
       <form className="formulario-producto" onSubmit={manejarEnvio}>
         <div className="campo-formulario">
           <label htmlFor="nombre">Nombre</label>
@@ -112,9 +145,25 @@ function FormularioProducto({ onAgregar }) {
           />
         </div>
 
-        <button type="submit" className="btn-agregar">
-          Agregar producto
-        </button>
+        <div className="acciones-formulario">
+          <button type="submit" className="btn-agregar">
+            {productoEditando ? 'Guardar cambios' : 'Agregar producto'}
+          </button>
+
+          {productoEditando && (
+            <button
+              type="button"
+              className="btn-cancelar"
+              onClick={() => {
+                onCancelarEdicion();
+                setFormulario({ nombre: '', categoria: '', precio: '', stock: '' });
+                setError('');
+              }}
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
       </form>
 
       {error && <p className="mensaje-error">{error}</p>}
