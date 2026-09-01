@@ -752,21 +752,6 @@ function App() {
               type="checkbox"
               checked={soloDisponibles}
               onChange={(evento) => setSoloDisponibles(evento.target.checked)}
-            />
-            Mostrar únicamente disponibles
-          </label>
-
-          <button className="btn-limpiar" onClick={limpiarFiltros}>
-            Limpiar filtros
-          </button>
-        </div>
-
-        <div className="grupo-opciones">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={soloDisponibles}
-              onChange={(evento) => setSoloDisponibles(evento.target.checked)}
             /> Mostrar únicamente disponibles
           </label>
 
