@@ -1099,3 +1099,39 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+
+.botones-inventario {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-restaurar {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-restaurar:hover {
+  background-color: #f59e0b;
+  color: #ffffff;
+  border-color: #f59e0b;
+}
+
+@media (max-width: 600px) {
+  .botones-inventario {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .botones-inventario button {
+    width: 100%;
+  }
+}

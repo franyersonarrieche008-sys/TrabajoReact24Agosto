@@ -642,6 +642,18 @@ function App() {
     setOrden('ninguno');
   };
 
+  const restaurarInventario = () => {
+  const confirmar = window.confirm(
+    '¿Seguro que quieres restaurar el inventario original? Se perderán los cambios realizados.'
+  );
+
+  if (!confirmar) return;
+
+  setProductos(productosIniciales);
+  setProductoEditando(null);
+  mostrarMensaje('Inventario restaurado correctamente.');
+  };
+
   // ------------------------------------------------------------------
   // TABLERO DE INDICADORES
   // ------------------------------------------------------------------
@@ -748,6 +760,29 @@ function App() {
             Limpiar filtros
           </button>
         </div>
+
+        <div className="grupo-opciones">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={soloDisponibles}
+              onChange={(evento) => setSoloDisponibles(evento.target.checked)}
+            /> Mostrar únicamente disponibles
+          </label>
+
+  <div className="botones-inventario">
+    <button className="btn-limpiar" onClick={limpiarFiltros}>
+      Limpiar filtros
+    </button>
+
+    <button
+      className="btn-restaurar"
+      onClick={restaurarInventario}
+    >
+      ↻ Restaurar inventario
+    </button>
+  </div>
+</div>
 
         <p className="contador-resultados">
           Productos encontrados: <strong>{productosOrdenados.length}</strong>
