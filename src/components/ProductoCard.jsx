@@ -82,14 +82,17 @@ function ProductoCard({ producto }) {
 export default ProductoCard;*/
 
 
-// 31 de agosto del 2026 - Taller 3: botones de eliminar y modificar stock
-function ProductoCard({ producto, onEliminar, onModificarStock }) {
+// 1 de septiembre del 2026 - Taller 1 Sep: botón Editar e indicador de stock bajo
+function ProductoCard({ producto, onEliminar, onModificarStock, onEditar }) {
   // Desestructuración de las propiedades del producto
   const { id, nombre, precio, categoria, stock, imagen } = producto;
 
   const estaDisponible = stock > 0;
   const estadoTexto = estaDisponible ? 'Disponible' : 'Agotado';
   const estadoClase = estaDisponible ? 'badge disponible' : 'badge agotado';
+
+  // Reto de autonomía: indicador de stock bajo (1 o 2 unidades).
+  const stockBajo = stock > 0 && stock <= 2;
 
   // Formato de moneda en pesos colombianos
   const formatearPrecio = (valor) => valor.toLocaleString('es-CO');
@@ -113,6 +116,8 @@ function ProductoCard({ producto, onEliminar, onModificarStock }) {
           <p className="producto-precio">${formatearPrecio(precio)}</p>
           <p className="producto-stock">Stock: {stock}</p>
         </div>
+
+        {stockBajo && <p className="aviso-stock-bajo">⚠ Stock bajo</p>}
 
         {/* Control de stock: onModificarStock viene por props desde App.jsx.
             El botón "-" envía -1 y el botón "+" envía +1. App.jsx se
@@ -146,15 +151,27 @@ function ProductoCard({ producto, onEliminar, onModificarStock }) {
           {stock > 0 ? 'Ver producto' : 'Agotado'}
         </button>
 
-        {/* onClick envía el id al padre; App.jsx usa filter() para
-            quitar ese producto del inventario (ver comentario en App.jsx) */}
-        <button
-          type="button"
-          className="btn-eliminar"
-          onClick={() => onEliminar(id)}
-        >
-          Eliminar
-        </button>
+        <div className="acciones-card">
+          {/* MISIÓN 4: envía el producto completo al padre, que lo guarda
+              en productoEditando para que el formulario lo cargue */}
+          <button
+            type="button"
+            className="btn-editar"
+            onClick={() => onEditar(producto)}
+          >
+            Editar
+          </button>
+
+          {/* onClick envía el id al padre; App.jsx usa filter() para
+              quitar ese producto del inventario (ver comentario en App.jsx) */}
+          <button
+            type="button"
+            className="btn-eliminar"
+            onClick={() => onEliminar(id)}
+          >
+            Eliminar
+          </button>
+        </div>
       </div>
     </article>
   );
